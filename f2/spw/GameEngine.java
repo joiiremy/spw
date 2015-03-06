@@ -20,7 +20,7 @@ public class GameEngine implements KeyListener, GameReporter{
 	private Timer timer;
 	
 	private long score = 0;
-	private double difficulty = 0.1;
+	private double difficulty = 10;
 	
 	public GameEngine(GamePanel gp, SpaceShip v) {
 		this.gp = gp;
