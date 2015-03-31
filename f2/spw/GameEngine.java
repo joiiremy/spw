@@ -16,25 +16,40 @@ public class GameEngine implements KeyListener, GameReporter{
 		
 	private ArrayList<Enemy> enemies = new ArrayList<Enemy>();	
 	private ArrayList<Bullet> bullets = new ArrayList<Bullet>();
+	private ArrayList<Item> items = new ArrayList<Item>();
 	private SpaceShip v;	
 	
 	private Timer timer;
+	private double itemTimer = 0;
+	private double enemyTimer = 0;
 	
 	private long score = 0;
 	private double difficulty = 0.1;
+	private int cntItem = 0;
 	
 	public GameEngine(GamePanel gp, SpaceShip v) {
 		this.gp = gp;
 		this.v = v;		
 		
 		gp.sprites.add(v);
-		
+				
 		timer = new Timer(50, new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				process();
 				bulletProcess();
+				itemTimer += 0.05;
+				enemyTimer += 0.05;
+				if( enemyTimer > 1 ){
+					generateEnemy();
+					enemyTimer = 0;
+				}
+				if( itemTimer > 10){
+					generateItem();
+					itemTimer = 0;
+				}
+				itemProcess();
 			}
 		});
 		timer.setRepeats(true);
@@ -56,6 +71,13 @@ public class GameEngine implements KeyListener, GameReporter{
 		gp.sprites.add(b);
 		bullets.add(b);
 	}
+	
+	private void generateItem(){
+		Item i = new Item((int)(Math.random()*390), 30);
+		gp.sprites.add(i);
+		items.add(i);
+	}
+	
 	private void bulletProcess(){
 		Iterator<Bullet> b_iter = bullets.iterator();
 		while(b_iter.hasNext()){
@@ -63,10 +85,41 @@ public class GameEngine implements KeyListener, GameReporter{
 			b.proceed();
 		}
 	}
-	private void process(){
-		if(Math.random() < difficulty){
-			generateEnemy();
+	private void itemProcess(){
+		Iterator<Item> i_iter = items.iterator();
+		while(i_iter.hasNext()){
+			Item i = i_iter.next();
+			i.proceed();
+			
+			if(!i.isAlive()){
+				i_iter.remove();
+				gp.sprites.remove(i);
+			}
 		}
+		
+		Rectangle2D.Double vr = v.getRectangle();
+		Rectangle2D.Double ir;
+		for(Item i : items){
+			ir = i.getRectangle();
+			if(ir.intersects(vr)){
+//				die();
+				i.alive = false;
+				cntItem++;
+				System.out.println("get item");
+				levelUp();
+				break;
+			}
+		}
+		
+	}
+	private void levelUp(){
+		score += 500;
+		System.out.println("lever up");
+	}
+	private void process(){
+//		if(Math.random() < difficulty){
+//			generateEnemy();
+//		}
 		
 		Iterator<Enemy> e_iter = enemies.iterator();
 		while(e_iter.hasNext()){
@@ -76,7 +129,7 @@ public class GameEngine implements KeyListener, GameReporter{
 			if(!e.isAlive()){
 				e_iter.remove();
 				gp.sprites.remove(e);
-				score += 100;
+				score += 10;
 			}
 		}
 		
@@ -87,6 +140,7 @@ public class GameEngine implements KeyListener, GameReporter{
 		for(Enemy e : enemies){
 			er = e.getRectangle();
 			if(er.intersects(vr)){
+				System.out.println("enermy crash");
 				die();
 				return;
 			}
@@ -113,7 +167,9 @@ public class GameEngine implements KeyListener, GameReporter{
 			break;
 		}
 	}
-
+	public int getNumItem(){
+		return cntItem;
+	}
 	public long getScore(){
 		return score;
 	}
