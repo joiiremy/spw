@@ -26,6 +26,7 @@ public class GameEngine implements KeyListener, GameReporter{
 	private long score = 0;
 	private double difficulty = 0.1;
 	private int cntItem = 0;
+	private int upgrade = 0;
 	
 	public GameEngine(GamePanel gp, SpaceShip v) {
 		this.gp = gp;
@@ -66,12 +67,23 @@ public class GameEngine implements KeyListener, GameReporter{
 		enemies.add(e);
 	}
 
-	private void generateBullet(int x, int y){
-		Bullet b = new Bullet(x, y);
+	protected void generateBullet(int x, int y, int upgrade){
+		switch(upgrade){
+		case 0: Bullet bc = new Bullet(x + 25, y + 25);
+				addSprite(bc);
+				break;
+		case 1: Bullet bl = new Bullet(x, y);
+				Bullet br = new Bullet(x + 50, y + 50);
+				addSprite(bl);
+				addSprite(br);
+				break;
+		}
+	}
+	public void addSprite(Bullet b){
 		gp.sprites.add(b);
 		bullets.add(b);
 	}
-	
+
 	private void generateItem(){
 		Item i = new Item((int)(Math.random()*390), 30);
 		gp.sprites.add(i);
@@ -83,6 +95,18 @@ public class GameEngine implements KeyListener, GameReporter{
 		while(b_iter.hasNext()){
 			Bullet b = b_iter.next();
 			b.proceed();
+		}
+		Rectangle2D.Double br;
+		for(Bullet b : bullets){
+			for(Enemy e: enemies){
+				Rectangle2D.Double er = e.getRectangle();
+				br = b.getRectangle();
+				if(br.intersects(er)){
+					b.alive = false;
+					e.alive = false;
+					System.out.println("kill enermy");
+				}
+			}
 		}
 	}
 	private void itemProcess(){
@@ -102,12 +126,13 @@ public class GameEngine implements KeyListener, GameReporter{
 		for(Item i : items){
 			ir = i.getRectangle();
 			if(ir.intersects(vr)){
-//				die();
 				i.alive = false;
 				cntItem++;
+				if( cntItem >= 3 ){
+					upgrade = 1;
+				}
 				System.out.println("get item");
 				levelUp();
-				break;
 			}
 		}
 		
@@ -117,10 +142,6 @@ public class GameEngine implements KeyListener, GameReporter{
 		System.out.println("lever up");
 	}
 	private void process(){
-//		if(Math.random() < difficulty){
-//			generateEnemy();
-//		}
-		
 		Iterator<Enemy> e_iter = enemies.iterator();
 		while(e_iter.hasNext()){
 			Enemy e = e_iter.next();
@@ -154,7 +175,7 @@ public class GameEngine implements KeyListener, GameReporter{
 	void controlVehicle(KeyEvent e) {
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_X:
-			generateBullet(v.x, v.y);
+			generateBullet(v.x, v.y, upgrade);
 			break;
 		case KeyEvent.VK_LEFT:
 			v.move(-1);
@@ -170,6 +191,7 @@ public class GameEngine implements KeyListener, GameReporter{
 	public int getNumItem(){
 		return cntItem;
 	}
+	
 	public long getScore(){
 		return score;
 	}

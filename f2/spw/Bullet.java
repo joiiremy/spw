@@ -9,7 +9,7 @@ public class Bullet extends Sprite{
 	public static final int Y_TO_DIE = 600;
 	
 	private int step = 12;
-	private boolean alive = true;
+	protected boolean alive = true;
 	
 	public Bullet(int x, int y) {
 		super(x, y, 2, 5);
@@ -28,7 +28,7 @@ public class Bullet extends Sprite{
 		g.fillRect(x, y, width, height);
 		
 	}
-
+	
 	public void proceed(){
 		y -= step;
 		if(y < 0){

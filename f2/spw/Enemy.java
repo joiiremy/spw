@@ -13,7 +13,7 @@ public class Enemy extends Sprite{
 	public static final int Y_TO_DIE = 600;
 	
 	private int step = 8;
-	private boolean alive = true;
+	protected boolean alive = true;
 	private Image enemyPic;
 	
 	public Enemy(int x, int y) {
