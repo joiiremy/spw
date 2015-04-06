@@ -13,7 +13,9 @@ import javax.swing.Timer;
 
 public class GameEngine implements KeyListener, GameReporter{
 	GamePanel gp;
-		
+	public int lp = 3;
+	public Lifepoint lifepoint;
+//	public Lifepoint lifepoint = new Lifepoint(gp.big);
 	private ArrayList<Enemy> enemies = new ArrayList<Enemy>();	
 	private ArrayList<Bullet> bullets = new ArrayList<Bullet>();
 	private ArrayList<Item> items = new ArrayList<Item>();
@@ -31,13 +33,16 @@ public class GameEngine implements KeyListener, GameReporter{
 	public GameEngine(GamePanel gp, SpaceShip v) {
 		this.gp = gp;
 		this.v = v;		
+		lifepoint = new Lifepoint(gp.big);
+		
 		
 		gp.sprites.add(v);
-				
+			
 		timer = new Timer(50, new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+//				lp();
 				process();
 				bulletProcess();
 				itemTimer += 0.05;
@@ -53,6 +58,7 @@ public class GameEngine implements KeyListener, GameReporter{
 				itemProcess();
 			}
 		});
+		
 		timer.setRepeats(true);
 		
 	}
@@ -60,34 +66,66 @@ public class GameEngine implements KeyListener, GameReporter{
 	public void start(){
 		timer.start();
 	}
-	
+	///////////////////// LIFEPOINT /////////////////////////
+//	public void lp(){
+//		
+//		gp.updateGameUI(this);
+//		Lifepoint lifepoint = new Lifepoint(gp.big);
+//		lifepoint.drawLifePoint();
+//	}
+	///////////////////// ENERMY JOB ////////////////////////
 	private void generateEnemy(){
 		Enemy e = new Enemy((int)(Math.random()*390), 30);
 		gp.sprites.add(e);
 		enemies.add(e);
 	}
+	
+	private void process(){
+//		lifepoint.drawLifePoint();
+		Iterator<Enemy> e_iter = enemies.iterator();
+		while(e_iter.hasNext()){
+			Enemy e = e_iter.next();
+			e.proceed();
+			
+			if(!e.isAlive()){
+				e_iter.remove();
+				gp.sprites.remove(e);
+				score += 10;
+			}
+		}
+		
+		gp.updateGameUI(this);
+		lifepoint.drawLifePoint();
+		Rectangle2D.Double vr = v.getRectangle();
+		Rectangle2D.Double er;
+		for(Enemy e : enemies){
+			er = e.getRectangle();
+			if(er.intersects(vr)){
+				System.out.println("enermy crash");
+				e.alive = false;
+				lifepoint.getHit();
+				if(!lifepoint.isAlive()){   
+					die();
+				}
+				return;
+			}
+			
+		}
 
+	}
+	
+	/////////////////// BULLET JOB //////////////////////////
 	protected void generateBullet(int x, int y, int upgrade){
 		switch(upgrade){
 		case 0: Bullet bc = new Bullet(x + 25, y + 25);
-				addSprite(bc);
+				addSpriteBullet(bc);
 				break;
 		case 1: Bullet bl = new Bullet(x, y);
 				Bullet br = new Bullet(x + 50, y + 50);
-				addSprite(bl);
-				addSprite(br);
+				addSpriteBullet(bl);
+				addSpriteBullet(br);
 				break;
 		}
-	}
-	public void addSprite(Bullet b){
-		gp.sprites.add(b);
-		bullets.add(b);
-	}
-
-	private void generateItem(){
-		Item i = new Item((int)(Math.random()*390), 30);
-		gp.sprites.add(i);
-		items.add(i);
 	}
 	
 	private void bulletProcess(){
@@ -109,6 +147,20 @@ public class GameEngine implements KeyListener, GameReporter{
 			}
 		}
 	}
+	
+	public void addSpriteBullet(Bullet b){
+		gp.sprites.add(b);
+		bullets.add(b);
+	}
+
+	///////////////// ITEM JOB ////////////////////////// 
+	private void generateItem(){
+		Item i = new Item((int)(Math.random()*390), 30);
+		gp.sprites.add(i);
+		items.add(i);
+	}
+	
+	
 	private void itemProcess(){
 		Iterator<Item> i_iter = items.iterator();
 		while(i_iter.hasNext()){
@@ -131,42 +183,16 @@ public class GameEngine implements KeyListener, GameReporter{
 				if( cntItem >= 3 ){
 					upgrade = 1;
 				}
-				System.out.println("get item");
-				levelUp();
+				collecItem();
 			}
 		}
 		
 	}
-	private void levelUp(){
+	private void collecItem(){
 		score += 500;
-		System.out.println("lever up");
+		System.out.println("collect Item");
 	}
-	private void process(){
-		Iterator<Enemy> e_iter = enemies.iterator();
-		while(e_iter.hasNext()){
-			Enemy e = e_iter.next();
-			e.proceed();
-			
-			if(!e.isAlive()){
-				e_iter.remove();
-				gp.sprites.remove(e);
-				score += 10;
-			}
-		}
-		
-		gp.updateGameUI(this);
-		
-		Rectangle2D.Double vr = v.getRectangle();
-		Rectangle2D.Double er;
-		for(Enemy e : enemies){
-			er = e.getRectangle();
-			if(er.intersects(vr)){
-				System.out.println("enermy crash");
-				die();
-				return;
-			}
-		}
-	}
+	
 	
 	public void die(){
 		timer.stop();
@@ -174,14 +200,20 @@ public class GameEngine implements KeyListener, GameReporter{
 	
 	void controlVehicle(KeyEvent e) {
 		switch (e.getKeyCode()) {
+		case KeyEvent.VK_UP: 
+			v.move(0,-1);
+			break;
+		case KeyEvent.VK_DOWN:
+			v.move(0, 1);
+			break;
 		case KeyEvent.VK_X:
 			generateBullet(v.x, v.y, upgrade);
 			break;
 		case KeyEvent.VK_LEFT:
-			v.move(-1);
+			v.move(-1,0);
 			break;
 		case KeyEvent.VK_RIGHT:
-			v.move(1);
+			v.move(1,0);
 			break;
 		case KeyEvent.VK_D:
 			difficulty += 0.1;

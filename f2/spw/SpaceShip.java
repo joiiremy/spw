@@ -31,12 +31,25 @@ public class SpaceShip extends Sprite{
 		g.drawImage(spaceshipPic, x, y, width, height, null);
 	}
 
-	public void move(int direction){
-		x += (step * direction);
-		if(x < 0)
-			x = 0;
-		if(x > 400 - width)
-			x = 400 - width;
-	}
+	public void move(int directionX, int directionY){
+		if(directionX != 0){
+			x += (step * directionX);
+			if(x < 0){
+				x = 0;
+			}
+			if(x > 400 - width){
+				x = 400 - width;
+			}
+		}else{
+			y += (step * directionY);
+				if(y < 0){
+					y = 0;
+				}
+				if(y > 600 - height){
+					y = 400 - height;
+				}
+			}
+		}
 
 }
+
