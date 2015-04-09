@@ -9,26 +9,32 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 public class SpaceShip extends Sprite{
-
-	int step = 10;
-	private Image spaceshipPic;
 	
+	private int count = 0;
+	int step = 12;
+	public Image spaceshipPic;
 	public SpaceShip(int x, int y, int width, int height) {
 		super(x, y, width, height);
-		try{
-			File file = new File("f2/image/spaceship.png");
-			spaceshipPic = ImageIO.read(file);
-		}catch(IOException e){
-			e.printStackTrace();
-		}
+		this.setImage("f2/image/spaceship.png");
+//		try{
+//			File file = new File("f2/image/spaceship.png");
+//			spaceshipPic = ImageIO.read(file);
+//		}catch(IOException e){
+//			e.printStackTrace();
+//		}
+		
 		
 	}
-
+	public void countItemBullet(){
+		count ++;
+	}
+	public int getCountItemBullet(){
+		return count;
+	}
+	
 	@Override
 	public void draw(Graphics2D g) {
-//		g.setColor(Color.GREEN);
-//		g.fillRect(x, y, width, height);
-		g.drawImage(spaceshipPic, x, y, width, height, null);
+		g.drawImage(this.img, x, y, width, height, null);
 	}
 
 	public void move(int directionX, int directionY){
@@ -46,7 +52,7 @@ public class SpaceShip extends Sprite{
 					y = 0;
 				}
 				if(y > 600 - height){
-					y = 400 - height;
+					y = 600 - height;
 				}
 			}
 		}

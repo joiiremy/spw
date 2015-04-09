@@ -24,7 +24,6 @@ public class Lifepoint{
 		}
 	}
 	public void drawLifePoint() {
-		System.out.println("lp == >" + lp);
 		for (int i = 0; i < lp; i++) {
 			g.drawImage(lifePic, 50 + (i * 30), 20, 30, 30, null);
 		}

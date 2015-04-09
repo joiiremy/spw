@@ -24,7 +24,7 @@ public class GamePanel extends JPanel {
 	public GamePanel() {
 		bi = new BufferedImage(400, 600, BufferedImage.TYPE_INT_ARGB);
 		try{
-			File file = new File("/Users/lucksikalosuvalna/git/spw/f2/image/background.png");
+			File file = new File("f2/image/background.png");
 			img = ImageIO.read(file);
 		}catch(IOException e){
 			e.printStackTrace();

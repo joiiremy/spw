@@ -12,35 +12,48 @@ public class Item extends Sprite{
 	public static final int Y_TO_FADE = 400;
 	public static final int Y_TO_DIE = 600;
 		
+	private int count = 0;
 	private int step = 8;
 	protected boolean alive = true;
-	private Image itemPic;
+//	public Image img;
 		
 	public Item(int x, int y) {
 		super(x, y, 20, 20);
-		try{
-			File file = new File("f2/image/item.png");
-			itemPic = ImageIO.read(file);
-		}catch(IOException e){
-			e.printStackTrace();
-		}
 			
 	}
 
 		@Override
 	public void draw(Graphics2D g) {
-		if(y < Y_TO_FADE)
-			g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
-		else{
-			g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 
-					(float)(Y_TO_DIE - y)/(Y_TO_DIE - Y_TO_FADE)));
-		}
-//		g.setColor(Color.GREEN);
-//		g.fillRect(x, y, width, height);
-		g.drawImage(itemPic, x, y, width, height, null);
+//		if(y < Y_TO_FADE)
+//			g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
+//		else{
+//			g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 
+//					(float)(Y_TO_DIE - y)/(Y_TO_DIE - Y_TO_FADE)));
+//		}
+		g.drawImage(this.img, x, y, 20, 20, null);
 			
 	}
-
+	
+//	public void setImage(String path){
+//		try{
+//			File file = new File(path);
+//			 img = ImageIO.read(file);
+//		}catch(IOException e){
+//			e.printStackTrace();
+//		}
+//	}
+	
+	
+//	public void count(){
+//		
+//	}
+//	public int getCount(){
+//		return count;
+//	}
+	public void collectItem(GameEngine g){
+		
+	}
+		
 	public void proceed(){
 		y += step;
 		if(y > Y_TO_DIE){

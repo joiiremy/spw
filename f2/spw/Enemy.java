@@ -17,27 +17,25 @@ public class Enemy extends Sprite{
 	private Image enemyPic;
 	
 	public Enemy(int x, int y) {
-		super(x, y, 20, 20);
-		try{
-			File file = new File("f2/image/enemy.png");
-			enemyPic = ImageIO.read(file);
-		}catch(IOException e){
-			e.printStackTrace();
-		}
-		
+		super(x, y, 40, 40);
+//		try{
+//			File file = new File("f2/image/enemy.png");
+//			enemyPic = ImageIO.read(file);
+//		}catch(IOException e){
+//			e.printStackTrace();
+//		}
+		super.setImage("f2/image/enemy.png");
 	}
 
 	@Override
 	public void draw(Graphics2D g) {
-		if(y < Y_TO_FADE)
-			g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
-		else{
-			g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 
-					(float)(Y_TO_DIE - y)/(Y_TO_DIE - Y_TO_FADE)));
-		}
-//		g.setColor(Color.RED);
-//		g.fillRect(x, y, width, height);
-		g.drawImage(enemyPic, x, y, width, height, null);
+//		if(y < Y_TO_FADE)
+//			g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
+//		else{
+//			g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 
+//					(float)(Y_TO_DIE - y)/(Y_TO_DIE - Y_TO_FADE)));
+//		}
+		g.drawImage(this.img, x, y, width, height, null);
 		
 	}
 

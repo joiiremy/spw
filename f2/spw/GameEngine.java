@@ -15,7 +15,6 @@ public class GameEngine implements KeyListener, GameReporter{
 	GamePanel gp;
 	public int lp = 3;
 	public Lifepoint lifepoint;
-//	public Lifepoint lifepoint = new Lifepoint(gp.big);
 	private ArrayList<Enemy> enemies = new ArrayList<Enemy>();	
 	private ArrayList<Bullet> bullets = new ArrayList<Bullet>();
 	private ArrayList<Item> items = new ArrayList<Item>();
@@ -23,9 +22,11 @@ public class GameEngine implements KeyListener, GameReporter{
 	
 	private Timer timer;
 	private double itemTimer = 0;
+	private double itemClearMapTimer = 0; 
 	private double enemyTimer = 0;
+	private double bulletReset = 0;
 	
-	private long score = 0;
+	public long score = 0;
 	private double difficulty = 0.1;
 	private int cntItem = 0;
 	private int upgrade = 0;
@@ -42,19 +43,8 @@ public class GameEngine implements KeyListener, GameReporter{
 			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-//				lp();
 				process();
-				bulletProcess();
-				itemTimer += 0.05;
-				enemyTimer += 0.05;
-				if( enemyTimer > 1 ){
-					generateEnemy();
-					enemyTimer = 0;
-				}
-				if( itemTimer > 10){
-					generateItem();
-					itemTimer = 0;
-				}
+				bulletProcess();				
 				itemProcess();
 			}
 		});
@@ -67,12 +57,7 @@ public class GameEngine implements KeyListener, GameReporter{
 		timer.start();
 	}
 	///////////////////// LIFEPOINT /////////////////////////
-//	public void lp(){
-//		
-//		gp.updateGameUI(this);
-//		Lifepoint lifepoint = new Lifepoint(gp.big);
-//		lifepoint.drawLifePoint();
-//	}
+
 	///////////////////// ENERMY JOB ////////////////////////
 	private void generateEnemy(){
 		Enemy e = new Enemy((int)(Math.random()*390), 30);
@@ -80,8 +65,20 @@ public class GameEngine implements KeyListener, GameReporter{
 		enemies.add(e);
 	}
 	
+	public void clearMap(){
+		Iterator<Enemy> e_iter = enemies.iterator();
+		while(e_iter.hasNext()){
+			Enemy e = e_iter.next();
+			e.alive = false;
+		}
+	}
+	
 	private void process(){
-//		lifepoint.drawLifePoint();
+		enemyTimer += 0.05;
+		if( enemyTimer > 1 ){
+			generateEnemy();
+			enemyTimer = 0;
+		}
 		Iterator<Enemy> e_iter = enemies.iterator();
 		while(e_iter.hasNext()){
 			Enemy e = e_iter.next();
@@ -115,13 +112,13 @@ public class GameEngine implements KeyListener, GameReporter{
 	}
 	
 	/////////////////// BULLET JOB //////////////////////////
-	protected void generateBullet(int x, int y, int upgrade){
+	public void generateBullet(int x, int y, int upgrade){
 		switch(upgrade){
-		case 0: Bullet bc = new Bullet(x + 25, y + 25);
+		case 0: Bullet bc = new Bullet(x + 25, y);
 				addSpriteBullet(bc);
 				break;
 		case 1: Bullet bl = new Bullet(x, y);
-				Bullet br = new Bullet(x + 50, y + 50);
+				Bullet br = new Bullet(x + 50, y);
 				addSpriteBullet(bl);
 				addSpriteBullet(br);
 				break;
@@ -129,6 +126,12 @@ public class GameEngine implements KeyListener, GameReporter{
 	}
 	
 	private void bulletProcess(){
+		if(upgrade != 0){
+			bulletReset += 0.05;
+			if( bulletReset == 3 ){
+				upgrade = 0;
+			}
+		}
 		Iterator<Bullet> b_iter = bullets.iterator();
 		while(b_iter.hasNext()){
 			Bullet b = b_iter.next();
@@ -154,14 +157,31 @@ public class GameEngine implements KeyListener, GameReporter{
 	}
 
 	///////////////// ITEM JOB ////////////////////////// 
-	private void generateItem(){
-		Item i = new Item((int)(Math.random()*390), 30);
+	private void generateItemBullet(){
+		ItemBullet i = new ItemBullet((int)(Math.random()*390), 30);
 		gp.sprites.add(i);
 		items.add(i);
 	}
 	
+	private void generateItemClearMap(){
+		ItemClearMap ic = new ItemClearMap((int)(Math.random()*390),30);
+		gp.sprites.add(ic);
+		items.add(ic);
+	}
+	
 	
 	private void itemProcess(){
+		itemTimer += 0.05;
+		itemClearMapTimer += 0.05;
+		if( itemClearMapTimer > 5 ){
+			System.out.println("itemClear Timer :" + itemClearMapTimer);
+			generateItemClearMap();
+			itemClearMapTimer = 0;
+		}
+		if( itemTimer > 2){
+			generateItemBullet();
+			itemTimer = 0;
+		}
 		Iterator<Item> i_iter = items.iterator();
 		while(i_iter.hasNext()){
 			Item i = i_iter.next();
@@ -179,21 +199,19 @@ public class GameEngine implements KeyListener, GameReporter{
 			ir = i.getRectangle();
 			if(ir.intersects(vr)){
 				i.alive = false;
-				cntItem++;
-				if( cntItem >= 3 ){
+				i.collectItem(this);
+				if(i instanceof ItemBullet){
+					v.countItemBullet();
+				}
+				System.out.println(v.getCountItemBullet());
+				if( v.getCountItemBullet() >= 3 ){
 					upgrade = 1;
 				}
-				collecItem();
 			}
 		}
 		
 	}
-	private void collecItem(){
-		score += 500;
-		System.out.println("collect Item");
-	}
-	
-	
+
 	public void die(){
 		timer.stop();
 	}
