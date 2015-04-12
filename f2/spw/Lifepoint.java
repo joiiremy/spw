@@ -10,8 +10,9 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 
 public class Lifepoint{
+	GameReporter reporter;
 	Graphics2D g;
-	protected int lp = 3;
+	public int lp = 3;
 	public boolean life = true;
 	private Image lifePic;
 	public Lifepoint(Graphics2D g){
@@ -24,10 +25,14 @@ public class Lifepoint{
 		}
 	}
 	public void drawLifePoint() {
-		for (int i = 0; i < lp; i++) {
-			g.drawImage(lifePic, 50 + (i * 30), 20, 30, 30, null);
+		if( lp < 4){
+			for (int i = 0; i < lp; i++) {
+				g.drawImage(lifePic, 0 + (i * 30), 10, 30, 30, null);
+			}
+		}else{
+			g.drawImage(lifePic, 0, 10, 30, 30, null);
 		}
-			
+		
 	}
 	
 	public void getHit() {

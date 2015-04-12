@@ -13,7 +13,6 @@ import javax.swing.Timer;
 
 public class GameEngine implements KeyListener, GameReporter{
 	GamePanel gp;
-	public int lp = 3;
 	public Lifepoint lifepoint;
 	private ArrayList<Enemy> enemies = new ArrayList<Enemy>();	
 	private ArrayList<Bullet> bullets = new ArrayList<Bullet>();
@@ -22,8 +21,10 @@ public class GameEngine implements KeyListener, GameReporter{
 	
 	private Timer timer;
 	private double itemTimer = 0;
-	private double itemClearMapTimer = 0; 
+	private double itemClearMapTimer = 0;
+	private double itemLifeTimer = 0;
 	private double enemyTimer = 0;
+	private double enemyshootingTimer = 0;
 	private double bulletReset = 0;
 	
 	public long score = 0;
@@ -35,7 +36,6 @@ public class GameEngine implements KeyListener, GameReporter{
 		this.gp = gp;
 		this.v = v;		
 		lifepoint = new Lifepoint(gp.big);
-		
 		
 		gp.sprites.add(v);
 			
@@ -56,11 +56,19 @@ public class GameEngine implements KeyListener, GameReporter{
 	public void start(){
 		timer.start();
 	}
-	///////////////////// LIFEPOINT /////////////////////////
 
 	///////////////////// ENERMY JOB ////////////////////////
 	private void generateEnemy(){
 		Enemy e = new Enemy((int)(Math.random()*390), 30);
+		addSpriteEnemy(e);
+	}
+	
+	private void generateEnemyShooting(){
+		EnemyShooting es = new EnemyShooting((int)(Math.random()*390), 30);
+		addSpriteEnemy(es);
+	}
+	
+	private void addSpriteEnemy(Enemy e){
 		gp.sprites.add(e);
 		enemies.add(e);
 	}
@@ -79,11 +87,21 @@ public class GameEngine implements KeyListener, GameReporter{
 			generateEnemy();
 			enemyTimer = 0;
 		}
+		enemyshootingTimer += 0.05;
+		if( enemyshootingTimer > 5 ){
+			generateEnemyShooting();
+			generateEnemyShooting();
+			enemyshootingTimer = 0;
+		}
+		
+		
 		Iterator<Enemy> e_iter = enemies.iterator();
 		while(e_iter.hasNext()){
 			Enemy e = e_iter.next();
 			e.proceed();
-			
+			if( e instanceof EnemyShooting ){
+				((EnemyShooting) e).enemyShoot(this);	
+			}
 			if(!e.isAlive()){
 				e_iter.remove();
 				gp.sprites.remove(e);
@@ -108,7 +126,7 @@ public class GameEngine implements KeyListener, GameReporter{
 			}
 			
 		}
-
+		
 	}
 	
 	/////////////////// BULLET JOB //////////////////////////
@@ -124,36 +142,45 @@ public class GameEngine implements KeyListener, GameReporter{
 				break;
 		}
 	}
+	public void generateEnemyBullet(int x, int y){
+		BulletofEnemy b = new BulletofEnemy(x + 10, y + 20);
+		addSpriteBullet(b);
+	}
+	public void addSpriteBullet(Bullet b){
+		gp.sprites.add(b);
+		bullets.add(b);
+	}
 	
 	private void bulletProcess(){
 		if(upgrade != 0){
 			bulletReset += 0.05;
-			if( bulletReset == 3 ){
+			if( bulletReset > 7 ){
 				upgrade = 0;
+				bulletReset = 0;
 			}
 		}
 		Iterator<Bullet> b_iter = bullets.iterator();
 		while(b_iter.hasNext()){
 			Bullet b = b_iter.next();
-			b.proceed();
+			b.bulletProceed();
 		}
+		Rectangle2D.Double vr = v.getRectangle();
 		Rectangle2D.Double br;
 		for(Bullet b : bullets){
+			br = b.getRectangle();
+			if( br.intersects(vr) && (b instanceof BulletofEnemy)){
+				lifepoint.lp -= 0.05;
+				System.out.println("========= life point : " + lifepoint.lp);
+			}
 			for(Enemy e: enemies){
 				Rectangle2D.Double er = e.getRectangle();
 				br = b.getRectangle();
 				if(br.intersects(er)){
 					b.alive = false;
 					e.alive = false;
-					System.out.println("kill enermy");
 				}
 			}
 		}
-	}
-	
-	public void addSpriteBullet(Bullet b){
-		gp.sprites.add(b);
-		bullets.add(b);
 	}
 
 	///////////////// ITEM JOB ////////////////////////// 
@@ -169,19 +196,29 @@ public class GameEngine implements KeyListener, GameReporter{
 		items.add(ic);
 	}
 	
+	private void generateItemLife(){
+		ItemLife il = new ItemLife((int)(Math.random()*390), 30);
+		gp.sprites.add(il);
+		items.add(il);
+	}
 	
 	private void itemProcess(){
 		itemTimer += 0.05;
 		itemClearMapTimer += 0.05;
+		itemLifeTimer += 0.05;
 		if( itemClearMapTimer > 5 ){
-			System.out.println("itemClear Timer :" + itemClearMapTimer);
 			generateItemClearMap();
 			itemClearMapTimer = 0;
 		}
-		if( itemTimer > 2){
+		if( itemTimer > 4){
 			generateItemBullet();
 			itemTimer = 0;
 		}
+		if( itemLifeTimer > 7){
+			generateItemLife();
+			itemLifeTimer = 0;
+		}
+		
 		Iterator<Item> i_iter = items.iterator();
 		while(i_iter.hasNext()){
 			Item i = i_iter.next();
@@ -203,15 +240,14 @@ public class GameEngine implements KeyListener, GameReporter{
 				if(i instanceof ItemBullet){
 					v.countItemBullet();
 				}
-				System.out.println(v.getCountItemBullet());
 				if( v.getCountItemBullet() >= 3 ){
 					upgrade = 1;
 				}
 			}
-		}
-		
+		}	
 	}
-
+	
+/////////////////////////////////////////////////////////////////////
 	public void die(){
 		timer.stop();
 	}
@@ -238,8 +274,8 @@ public class GameEngine implements KeyListener, GameReporter{
 			break;
 		}
 	}
-	public int getNumItem(){
-		return cntItem;
+	public int getNumLife(){
+		return lifepoint.lp;
 	}
 	
 	public long getScore(){

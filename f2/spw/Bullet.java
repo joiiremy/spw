@@ -8,7 +8,7 @@ public class Bullet extends Sprite{
 	public static final int Y_TO_FADE = 400;
 	public static final int Y_TO_DIE = 600;
 	
-	private int step = 12;
+	protected int step = 12;
 	protected boolean alive = true;
 	
 	public Bullet(int x, int y) {
@@ -29,14 +29,15 @@ public class Bullet extends Sprite{
 		
 	}
 	
-	public void proceed(){
+	public boolean isAlive(){
+		return alive;
+	}
+
+	public void bulletProceed() {
+		// TODO Auto-generated method stub
 		y -= step;
 		if(y < 0){
 			alive = false;
 		}
-	}
-	
-	public boolean isAlive(){
-		return alive;
 	}
 }

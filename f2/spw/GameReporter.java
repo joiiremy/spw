@@ -1,8 +1,7 @@
 package f2.spw;
 
 public interface GameReporter {
-	
-	int getNumItem();
+	public int getNumLife();
 	long getScore();
 
 }

@@ -12,18 +12,11 @@ public class Enemy extends Sprite{
 	public static final int Y_TO_FADE = 400;
 	public static final int Y_TO_DIE = 600;
 	
-	private int step = 8;
+	protected int step = 8;
 	protected boolean alive = true;
-	private Image enemyPic;
 	
 	public Enemy(int x, int y) {
 		super(x, y, 40, 40);
-//		try{
-//			File file = new File("f2/image/enemy.png");
-//			enemyPic = ImageIO.read(file);
-//		}catch(IOException e){
-//			e.printStackTrace();
-//		}
 		super.setImage("f2/image/enemy.png");
 	}
 

@@ -15,8 +15,6 @@ public class Item extends Sprite{
 	private int count = 0;
 	private int step = 8;
 	protected boolean alive = true;
-//	public Image img;
-		
 	public Item(int x, int y) {
 		super(x, y, 20, 20);
 			
@@ -33,23 +31,7 @@ public class Item extends Sprite{
 		g.drawImage(this.img, x, y, 20, 20, null);
 			
 	}
-	
-//	public void setImage(String path){
-//		try{
-//			File file = new File(path);
-//			 img = ImageIO.read(file);
-//		}catch(IOException e){
-//			e.printStackTrace();
-//		}
-//	}
-	
-	
-//	public void count(){
-//		
-//	}
-//	public int getCount(){
-//		return count;
-//	}
+
 	public void collectItem(GameEngine g){
 		
 	}

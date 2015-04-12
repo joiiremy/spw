@@ -15,15 +15,7 @@ public class SpaceShip extends Sprite{
 	public Image spaceshipPic;
 	public SpaceShip(int x, int y, int width, int height) {
 		super(x, y, width, height);
-		this.setImage("f2/image/spaceship.png");
-//		try{
-//			File file = new File("f2/image/spaceship.png");
-//			spaceshipPic = ImageIO.read(file);
-//		}catch(IOException e){
-//			e.printStackTrace();
-//		}
-		
-		
+		super.setImage("f2/image/spaceship.png");		
 	}
 	public void countItemBullet(){
 		count ++;
