@@ -13,13 +13,15 @@ import javax.swing.Timer;
 
 public class GameEngine implements KeyListener, GameReporter{
 	GamePanel gp;
-	public Lifepoint lifepoint;
+	public LifepointSpaceship shipLifepoint;
+	public LifepointBoss bossLifepoint;
 	private ArrayList<Enemy> enemies = new ArrayList<Enemy>();	
 	private ArrayList<Bullet> bullets = new ArrayList<Bullet>();
 	private ArrayList<Item> items = new ArrayList<Item>();
 	private SpaceShip v;	
 	
 	private Timer timer;
+	double wordBossTimer = 0;
 	private double itemTimer = 0;
 	private double itemClearMapTimer = 0;
 	private double itemLifeTimer = 0;
@@ -27,15 +29,20 @@ public class GameEngine implements KeyListener, GameReporter{
 	private double enemyshootingTimer = 0;
 	private double bulletReset = 0;
 	
+	private boolean bossLife = false;
+	private boolean stopgenerate = true;
+	private boolean stop = true;
+	private boolean bossComing = false;
+	private boolean wordBoss = false;
 	public long score = 0;
 	private double difficulty = 0.1;
-	private int cntItem = 0;
 	private int upgrade = 0;
 	
 	public GameEngine(GamePanel gp, SpaceShip v) {
 		this.gp = gp;
 		this.v = v;		
-		lifepoint = new Lifepoint(gp.big);
+		shipLifepoint = new LifepointSpaceship(gp.big);		
+		bossLifepoint = new LifepointBoss(gp.big);	
 		
 		gp.sprites.add(v);
 			
@@ -63,6 +70,12 @@ public class GameEngine implements KeyListener, GameReporter{
 		addSpriteEnemy(e);
 	}
 	
+	private void generateEnemyBoss(){
+		bossComing = false;
+		EnemyBoss eboss = new EnemyBoss(150, 20);
+		addSpriteEnemy(eboss);
+	}
+	
 	private void generateEnemyShooting(){
 		EnemyShooting es = new EnemyShooting((int)(Math.random()*390), 30);
 		addSpriteEnemy(es);
@@ -80,15 +93,14 @@ public class GameEngine implements KeyListener, GameReporter{
 			e.alive = false;
 		}
 	}
-	
 	private void process(){
 		enemyTimer += 0.05;
-		if( enemyTimer > 1 ){
+		if( enemyTimer > 1  && stopgenerate){
 			generateEnemy();
 			enemyTimer = 0;
 		}
 		enemyshootingTimer += 0.05;
-		if( enemyshootingTimer > 5 ){
+		if( enemyshootingTimer > 5 && stopgenerate){
 			generateEnemyShooting();
 			generateEnemyShooting();
 			enemyshootingTimer = 0;
@@ -108,9 +120,22 @@ public class GameEngine implements KeyListener, GameReporter{
 				score += 10;
 			}
 		}
+		if(score > 200 && stop){
+			stop = gotoBossStage();
+		}
 		
 		gp.updateGameUI(this);
-		lifepoint.drawLifePoint();
+		shipLifepoint.drawLifePoint();
+		System.out.println("bossLife : " + bossLife);
+		if(bossLife){
+			System.out.println("if");
+			bossStage();
+		}
+		if(bossComing){
+			generateEnemyBoss();
+			bossLife = true;
+			System.out.println("bossComing: " + bossComing);
+		}
 		Rectangle2D.Double vr = v.getRectangle();
 		Rectangle2D.Double er;
 		for(Enemy e : enemies){
@@ -118,8 +143,8 @@ public class GameEngine implements KeyListener, GameReporter{
 			if(er.intersects(vr)){
 				System.out.println("enermy crash");
 				e.alive = false;
-				lifepoint.getHit();
-				if(!lifepoint.isAlive()){   
+				shipLifepoint.getHit();
+				if(!shipLifepoint.isAlive()){   
 					die();
 				}
 				return;
@@ -169,8 +194,8 @@ public class GameEngine implements KeyListener, GameReporter{
 		for(Bullet b : bullets){
 			br = b.getRectangle();
 			if( br.intersects(vr) && (b instanceof BulletofEnemy)){
-				lifepoint.lp -= 0.05;
-				System.out.println("========= life point : " + lifepoint.lp);
+				shipLifepoint.lp -= 0.05;
+//				System.out.println("========= life point : " + shipLifepoint.lp);
 			}
 			for(Enemy e: enemies){
 				Rectangle2D.Double er = e.getRectangle();
@@ -206,15 +231,15 @@ public class GameEngine implements KeyListener, GameReporter{
 		itemTimer += 0.05;
 		itemClearMapTimer += 0.05;
 		itemLifeTimer += 0.05;
-		if( itemClearMapTimer > 5 ){
+		if( itemClearMapTimer > 5 && stopgenerate){
 			generateItemClearMap();
 			itemClearMapTimer = 0;
 		}
-		if( itemTimer > 4){
+		if( itemTimer > 1 && stopgenerate){
 			generateItemBullet();
 			itemTimer = 0;
 		}
-		if( itemLifeTimer > 7){
+		if( itemLifeTimer > 7 && stopgenerate){
 			generateItemLife();
 			itemLifeTimer = 0;
 		}
@@ -274,8 +299,40 @@ public class GameEngine implements KeyListener, GameReporter{
 			break;
 		}
 	}
+	
+	public boolean gotoBossStage(){
+		wordBoss = true;
+		stopgenerate = false;
+		wordBossTimer += 0.05;
+		if( wordBossTimer > 5 ){
+			wordBoss = false;
+			bossComing = true;
+			return false;
+		}
+		return stop;
+	}
+	public boolean drawBossStage(){
+		return wordBoss;
+	}
+	
+	public void bossStage(){
+		bossLifepoint.drawLifePoint();
+	}
+	
+//	public boolean bossStage(){
+//		bossLifepoint.drawLifePoint();
+//		return bossLife;
+//	}
+	
+	public boolean bossNow(){
+		return bossLife;
+	}
+	
+	public int getNumBossLife(){
+		return bossLifepoint.lpboss;
+	}
 	public int getNumLife(){
-		return lifepoint.lp;
+		return shipLifepoint.lp;
 	}
 	
 	public long getScore(){

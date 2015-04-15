@@ -37,8 +37,15 @@ public class GamePanel extends JPanel {
 		big.setColor(Color.WHITE);
 		big.drawImage(img, 0, 0, null);
 		if( reporter.getNumLife() > 3 ){
-			big.drawString(String.format("x %d", reporter.getNumLife()), 30, 30);
+			big.drawString(String.format("x %d", reporter.getNumLife()), 30, 570);
 		}
+		if( reporter.drawBossStage() ){
+			big.drawString(String.format("============  BOSS IS IN THE HOUSE  ============="), 0,200);
+		}
+		if( reporter.bossNow() ){
+			big.drawString(String.format("x %d", reporter.getNumBossLife()), 30, 30);
+		}
+		
 		big.drawString(String.format("%08d", reporter.getScore()), 300, 20);
 		for(Sprite s : sprites){
 			s.draw(big);

@@ -7,6 +7,6 @@ public class ItemLife extends Item{
 		setImage("f2/image/life.png");
 	}
 	public void collectItem(GameEngine g){
-		g.lifepoint.lp++;
+		g.shipLifepoint.lp++;
 	}
 }
