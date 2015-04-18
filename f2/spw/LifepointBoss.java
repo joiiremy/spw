@@ -19,7 +19,11 @@ public class LifepointBoss extends Lifepoint {
 	}
 	
 	public void getHit() {
-
+		lpboss--;
+		drawLifePoint();
+		if(lpboss < 0){
+			life = false;
+		}
 	}
 	public boolean isAlive(){
 		return life;

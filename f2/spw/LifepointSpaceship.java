@@ -28,6 +28,7 @@ public class LifepointSpaceship extends Lifepoint{
 		lp--;
 		drawLifePoint();
 		if(lp < 0){
+			System.out.println("life < 0 ");
 			life = false;
 		}
 	}

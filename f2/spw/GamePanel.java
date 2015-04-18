@@ -42,7 +42,7 @@ public class GamePanel extends JPanel {
 		if( reporter.drawBossStage() ){
 			big.drawString(String.format("============  BOSS IS IN THE HOUSE  ============="), 0,200);
 		}
-		if( reporter.bossNow() ){
+		if( reporter.bossNow() && reporter.getNumBossLife() > 3 ){
 			big.drawString(String.format("x %d", reporter.getNumBossLife()), 30, 30);
 		}
 		

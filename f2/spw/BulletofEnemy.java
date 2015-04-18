@@ -8,8 +8,8 @@ public class BulletofEnemy extends Bullet{
 		super(x, y);
 		// TODO Auto-generated constructor stub
 	}
-
 	
+
 	public void bulletProceed(){
 		y += step;
 		if(y > Y_TO_DIE){

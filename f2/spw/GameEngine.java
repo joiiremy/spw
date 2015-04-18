@@ -29,6 +29,7 @@ public class GameEngine implements KeyListener, GameReporter{
 	private double enemyshootingTimer = 0;
 	private double bulletReset = 0;
 	
+	private boolean unlockBulletBoss = false;
 	private boolean bossLife = false;
 	private boolean stopgenerate = true;
 	private boolean stop = true;
@@ -73,11 +74,13 @@ public class GameEngine implements KeyListener, GameReporter{
 	private void generateEnemyBoss(){
 		bossComing = false;
 		EnemyBoss eboss = new EnemyBoss(150, 20);
+		eboss.enemyShoot(this);
 		addSpriteEnemy(eboss);
 	}
 	
 	private void generateEnemyShooting(){
 		EnemyShooting es = new EnemyShooting((int)(Math.random()*390), 30);
+//		es.enemyShoot(this);
 		addSpriteEnemy(es);
 	}
 	
@@ -93,6 +96,9 @@ public class GameEngine implements KeyListener, GameReporter{
 			e.alive = false;
 		}
 	}
+	
+//	Class[] elist = {EnemyShooting.class, EnemyBoss.class, Enemy.class};
+	
 	private void process(){
 		enemyTimer += 0.05;
 		if( enemyTimer > 1  && stopgenerate){
@@ -104,6 +110,7 @@ public class GameEngine implements KeyListener, GameReporter{
 			generateEnemyShooting();
 			generateEnemyShooting();
 			enemyshootingTimer = 0;
+//			Enemy e = elist[Random.nextInt(2)].newInstance(x, y)
 		}
 		
 		
@@ -111,8 +118,8 @@ public class GameEngine implements KeyListener, GameReporter{
 		while(e_iter.hasNext()){
 			Enemy e = e_iter.next();
 			e.proceed();
-			if( e instanceof EnemyShooting ){
-				((EnemyShooting) e).enemyShoot(this);	
+			if( e instanceof EnemyShooting){
+				((EnemyShooting) e).enemyShoot(this);
 			}
 			if(!e.isAlive()){
 				e_iter.remove();
@@ -126,13 +133,13 @@ public class GameEngine implements KeyListener, GameReporter{
 		
 		gp.updateGameUI(this);
 		shipLifepoint.drawLifePoint();
-		System.out.println("bossLife : " + bossLife);
+		// ===== BOSS STAGE BOSS STAGE BOSS STAGE BOSS STAGE BOSS STAGE BOSS STAGE===== // 
 		if(bossLife){
-			System.out.println("if");
 			bossStage();
 		}
 		if(bossComing){
 			generateEnemyBoss();
+			unlockBulletBoss = true;
 			bossLife = true;
 			System.out.println("bossComing: " + bossComing);
 		}
@@ -167,6 +174,12 @@ public class GameEngine implements KeyListener, GameReporter{
 				break;
 		}
 	}
+	
+	public void generateBossBullet(int x, int y){
+		BulletBoss bb = new BulletBoss(x , y);
+		addSpriteBullet(bb);
+	}
+	
 	public void generateEnemyBullet(int x, int y){
 		BulletofEnemy b = new BulletofEnemy(x + 10, y + 20);
 		addSpriteBullet(b);
@@ -194,15 +207,30 @@ public class GameEngine implements KeyListener, GameReporter{
 		for(Bullet b : bullets){
 			br = b.getRectangle();
 			if( br.intersects(vr) && (b instanceof BulletofEnemy)){
-				shipLifepoint.lp -= 0.05;
-//				System.out.println("========= life point : " + shipLifepoint.lp);
+				b.alive = false;
+//				gp.sprites.remove(b);
+				System.out.println("========= life point : " + shipLifepoint.lp);
+				shipLifepoint.getHit();
+				if(!shipLifepoint.isAlive()){   
+					die();
+				}
+				break;
 			}
 			for(Enemy e: enemies){
 				Rectangle2D.Double er = e.getRectangle();
 				br = b.getRectangle();
 				if(br.intersects(er)){
 					b.alive = false;
-					e.alive = false;
+//					gp.sprites.remove(b);
+					if( e instanceof EnemyBoss ){
+						bossLifepoint.getHit();
+						if(!bossLifepoint.isAlive()){   
+							die();
+						}
+					}else{
+						e.alive = false;
+					}
+					
 				}
 			}
 		}
@@ -235,7 +263,7 @@ public class GameEngine implements KeyListener, GameReporter{
 			generateItemClearMap();
 			itemClearMapTimer = 0;
 		}
-		if( itemTimer > 1 && stopgenerate){
+		if( itemTimer > 3 && stopgenerate){
 			generateItemBullet();
 			itemTimer = 0;
 		}
