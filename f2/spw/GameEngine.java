@@ -13,6 +13,7 @@ import javax.swing.Timer;
 
 public class GameEngine implements KeyListener, GameReporter{
 	GamePanel gp;
+	GameOverFrame gop = new GameOverFrame();
 	public LifepointSpaceship shipLifepoint;
 	public LifepointBoss bossLifepoint;
 	private ArrayList<Enemy> enemies = new ArrayList<Enemy>();	
@@ -301,8 +302,19 @@ public class GameEngine implements KeyListener, GameReporter{
 	}
 	
 /////////////////////////////////////////////////////////////////////
+	public boolean die = false;
 	public void die(){
+		gop.createFrame();
+		System.out.println("die");
 		timer.stop();
+//		die = true;
+//		try{
+//			Thread.sleep(1000);
+//			System.out.println("delay");
+//			timer.stop();
+//		}catch(Exception e){
+//			System.out.println(e);
+//		}	
 	}
 	
 	void controlVehicle(KeyEvent e) {

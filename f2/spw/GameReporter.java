@@ -6,5 +6,5 @@ public interface GameReporter {
 	int getNumLife();
 	int getNumBossLife();
 	long getScore();
-
+//	void die();
 }

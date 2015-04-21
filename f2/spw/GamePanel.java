@@ -1,5 +1,6 @@
 package f2.spw;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -15,7 +16,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 public class GamePanel extends JPanel {
-	
+//	GameOverPanel gameoverp = new GameOverPanel();
 	private BufferedImage bi;
 	private Image img;
 	Graphics2D big;
@@ -45,6 +46,11 @@ public class GamePanel extends JPanel {
 		if( reporter.bossNow() && reporter.getNumBossLife() > 3 ){
 			big.drawString(String.format("x %d", reporter.getNumBossLife()), 30, 30);
 		}
+//		if( reporter.getNumLife() == 0){
+//			System.out.println("hello");
+//			this.add(gameoverp, BorderLayout.CENTER);
+//			gameoverp.setVisible(true);
+//		}
 		
 		big.drawString(String.format("%08d", reporter.getScore()), 300, 20);
 		for(Sprite s : sprites){

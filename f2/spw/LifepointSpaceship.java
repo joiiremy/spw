@@ -8,7 +8,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 public class LifepointSpaceship extends Lifepoint{
-	public int lp = 7;
+	public int lp = 1;
 	public boolean life = true;
 	public LifepointSpaceship (Graphics2D g){
 		super(g);
