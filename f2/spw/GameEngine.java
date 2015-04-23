@@ -1,5 +1,6 @@
 package f2.spw;
 
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -8,11 +9,15 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import javax.swing.JButton;
+import javax.swing.JDesktopPane;
+import javax.swing.JPanel;
 import javax.swing.Timer;
 
 
 public class GameEngine implements KeyListener, GameReporter{
 	GamePanel gp;
+	JDesktopPane jdpDesktop;
 	GameOverFrame gop = new GameOverFrame();
 	public LifepointSpaceship shipLifepoint;
 	public LifepointBoss bossLifepoint;
@@ -20,6 +25,7 @@ public class GameEngine implements KeyListener, GameReporter{
 	private ArrayList<Bullet> bullets = new ArrayList<Bullet>();
 	private ArrayList<Item> items = new ArrayList<Item>();
 	private SpaceShip v;	
+	
 	
 	private Timer timer;
 	double wordBossTimer = 0;
@@ -40,9 +46,10 @@ public class GameEngine implements KeyListener, GameReporter{
 	private double difficulty = 0.1;
 	private int upgrade = 0;
 	
-	public GameEngine(GamePanel gp, SpaceShip v) {
+	public GameEngine(GamePanel gp, SpaceShip v, JDesktopPane jdpDesktop) {
 		this.gp = gp;
 		this.v = v;		
+		this.jdpDesktop = jdpDesktop;
 		shipLifepoint = new LifepointSpaceship(gp.big);		
 		bossLifepoint = new LifepointBoss(gp.big);	
 		
@@ -128,7 +135,7 @@ public class GameEngine implements KeyListener, GameReporter{
 				score += 10;
 			}
 		}
-		if(score > 200 && stop){
+		if(score > 3000 && stop){
 			stop = gotoBossStage();
 		}
 		
@@ -302,21 +309,26 @@ public class GameEngine implements KeyListener, GameReporter{
 	}
 	
 /////////////////////////////////////////////////////////////////////
-	public boolean die = false;
 	public void die(){
-		gop.createFrame();
-		System.out.println("die");
+		createFrame();
 		timer.stop();
-//		die = true;
-//		try{
-//			Thread.sleep(1000);
-//			System.out.println("delay");
-//			timer.stop();
-//		}catch(Exception e){
-//			System.out.println(e);
-//		}	
 	}
-	
+	protected void createFrame() {
+		GameOverFrame frame = new GameOverFrame();
+		frame.setVisible(true);
+//		JPanel panel = new JPanel();
+//		JButton retryBtn = new JButton("Retry");
+//		retryBtn.setSize(50, 50);
+//		panel.setLayout(new BorderLayout());
+//		panel.add(retryBtn, BorderLayout.CENTER);
+//		frame.setContentPane(panel);
+		// Every JInternalFrame must be added to content pane using JDesktopPane
+		jdpDesktop.add(frame);
+		try {
+			frame.setSelected(true);
+		} catch (java.beans.PropertyVetoException e) {
+		}
+	}
 	void controlVehicle(KeyEvent e) {
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_UP: 
