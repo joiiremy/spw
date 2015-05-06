@@ -17,8 +17,8 @@ import javax.swing.Timer;
 
 public class GameEngine implements KeyListener, GameReporter{
 	GamePanel gp;
+//	Main m;
 	JDesktopPane jdpDesktop;
-	GameOverFrame gop = new GameOverFrame();
 	public LifepointSpaceship shipLifepoint;
 	public LifepointBoss bossLifepoint;
 	private ArrayList<Enemy> enemies = new ArrayList<Enemy>();	
@@ -36,7 +36,7 @@ public class GameEngine implements KeyListener, GameReporter{
 	private double enemyshootingTimer = 0;
 	private double bulletReset = 0;
 	
-	private boolean unlockBulletBoss = false;
+	private boolean key = true;
 	private boolean bossLife = false;
 	private boolean stopgenerate = true;
 	private boolean stop = true;
@@ -68,11 +68,32 @@ public class GameEngine implements KeyListener, GameReporter{
 		timer.setRepeats(true);
 		
 	}
-	
 	public void start(){
+		reset();
 		timer.start();
+		
 	}
-
+	public void reset(){
+		itemTimer = 0;
+		itemClearMapTimer = 0;
+		itemLifeTimer = 0;
+		enemyTimer = 0;
+		enemyshootingTimer = 0;
+		bulletReset = 0;
+		
+		bossLife = false;
+		stopgenerate = true;
+		stop = true;
+		bossComing = false;
+		wordBoss = false;
+		score = 0;
+		difficulty = 0.1;
+		upgrade = 0;
+		resetMap();
+		shipLifepoint.lp = 7;
+		bossLifepoint.lpboss = 20;
+		
+	}
 	///////////////////// ENERMY JOB ////////////////////////
 	private void generateEnemy(){
 		Enemy e = new Enemy((int)(Math.random()*390), 30);
@@ -88,7 +109,6 @@ public class GameEngine implements KeyListener, GameReporter{
 	
 	private void generateEnemyShooting(){
 		EnemyShooting es = new EnemyShooting((int)(Math.random()*390), 30);
-//		es.enemyShoot(this);
 		addSpriteEnemy(es);
 	}
 	
@@ -103,6 +123,19 @@ public class GameEngine implements KeyListener, GameReporter{
 			Enemy e = e_iter.next();
 			e.alive = false;
 		}
+	}public void resetMap(){
+		Iterator<Item> i_iter = items.iterator();
+		Iterator<Bullet> b_iter = bullets.iterator();
+		while(i_iter.hasNext()){
+			Item i = i_iter.next();
+			i.alive = false;
+		}
+		while(b_iter.hasNext()){
+			System.out.println("hh");
+			Bullet b = b_iter.next();
+			b.alive = false;
+		}
+		clearMap();
 	}
 	
 //	Class[] elist = {EnemyShooting.class, EnemyBoss.class, Enemy.class};
@@ -141,13 +174,12 @@ public class GameEngine implements KeyListener, GameReporter{
 		
 		gp.updateGameUI(this);
 		shipLifepoint.drawLifePoint();
-		// ===== BOSS STAGE BOSS STAGE BOSS STAGE BOSS STAGE BOSS STAGE BOSS STAGE===== // 
+////// ===== BOSS STAGE BOSS STAGE BOSS STAGE BOSS STAGE BOSS STAGE BOSS STAGE===== ///// 
 		if(bossLife){
 			bossStage();
 		}
 		if(bossComing){
 			generateEnemyBoss();
-			unlockBulletBoss = true;
 			bossLife = true;
 			System.out.println("bossComing: " + bossComing);
 		}
@@ -216,7 +248,6 @@ public class GameEngine implements KeyListener, GameReporter{
 			br = b.getRectangle();
 			if( br.intersects(vr) && (b instanceof BulletofEnemy)){
 				b.alive = false;
-//				gp.sprites.remove(b);
 				System.out.println("========= life point : " + shipLifepoint.lp);
 				shipLifepoint.getHit();
 				if(!shipLifepoint.isAlive()){   
@@ -229,7 +260,6 @@ public class GameEngine implements KeyListener, GameReporter{
 				br = b.getRectangle();
 				if(br.intersects(er)){
 					b.alive = false;
-//					gp.sprites.remove(b);
 					if( e instanceof EnemyBoss ){
 						bossLifepoint.getHit();
 						if(!bossLifepoint.isAlive()){   
@@ -314,14 +344,8 @@ public class GameEngine implements KeyListener, GameReporter{
 		timer.stop();
 	}
 	protected void createFrame() {
-		GameOverFrame frame = new GameOverFrame();
+		GameOverFrame frame = new GameOverFrame(this);
 		frame.setVisible(true);
-//		JPanel panel = new JPanel();
-//		JButton retryBtn = new JButton("Retry");
-//		retryBtn.setSize(50, 50);
-//		panel.setLayout(new BorderLayout());
-//		panel.add(retryBtn, BorderLayout.CENTER);
-//		frame.setContentPane(panel);
 		// Every JInternalFrame must be added to content pane using JDesktopPane
 		jdpDesktop.add(frame);
 		try {
@@ -371,11 +395,6 @@ public class GameEngine implements KeyListener, GameReporter{
 		bossLifepoint.drawLifePoint();
 	}
 	
-//	public boolean bossStage(){
-//		bossLifepoint.drawLifePoint();
-//		return bossLife;
-//	}
-	
 	public boolean bossNow(){
 		return bossLife;
 	}
@@ -393,7 +412,12 @@ public class GameEngine implements KeyListener, GameReporter{
 	
 	@Override
 	public void keyPressed(KeyEvent e) {
-		controlVehicle(e);
+		try{
+			System.out.println("ssssssss");
+			controlVehicle(e);
+		}catch(Exception ex){
+			System.out.println("error " + ex);
+		}
 		
 	}
 
